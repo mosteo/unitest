@@ -1,0 +1,32 @@
+with "config/unitest_config.gpr";
+project Unitest is
+
+   for Source_Dirs use ("src/", "config/");
+   for Object_Dir use "obj/" & Unitest_Config.Build_Profile;
+   for Create_Missing_Dirs use "True";
+   for Exec_Dir use "bin";
+   for Main use ("unitest.adb");
+
+   Mode := external("UNIMODE", "none");
+
+   Binder_Extra := ();
+   case Mode is
+      when "none" => null;
+      when others =>
+         Binder_Extra := ("-Wb");
+   end case;
+
+   package Compiler is
+      for Default_Switches ("Ada")
+      use Unitest_Config.Ada_Compiler_Switches & ("-gnatW8");
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es") & Binder_Extra;
+   end Binder;
+
+   package Install is
+      for Artifacts (".") use ("share");
+   end Install;
+
+end Unitest;
